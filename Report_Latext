@@ -1,0 +1,25 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Group Coursework}
+\author{Samuel Schofield, Terry McNally, Ethan Sloane}
+\date{April 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The aim of this project is to design a control system for the pitch of an aircraft. The control system diagram to get us started is shown in figure 1.\\\\
+The input of the system is given by \(\delta\), the elevator deflection angle. Figure 1 also shows the angle of attack, \(\alpha\), the pitch angle \(\theta\) and the pitch rate \(r\).\\\\
+Our Task is to do what boeing couldn't and design an MCAS system that is BIBO stable to keep the aircraft at a safe pitch and make sure that 737 max passengers only have to worry about doors falling off and not the aircraft nosediving.\\\\
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{plen.png}
+    \caption{Diagram of the assigned control system}
+    \label{fig:Figure 1}
+\end{figure}
+
+\end{document}
