@@ -1,0 +1,45 @@
+%pre formatting latex maths code for section 3
+
+We start by applying a Laplace transform to each of these equations:
+\[\dot{\alpha}=-0.31\alpha + 56.7r + 0.231\delta\Rightarrow SA =-0.31A  + 56.7R + 0.231 \Delta\] 
+\[\dot{r}=-0.014\alpha - 0.426r +0.0203\delta\Rightarrow SR=-0.014A  - 0.426R +0.0203 \Delta \]
+\[\dot{\theta} = 56.7r\Rightarrow S \Theta = 56.7R\]\\
+If we then make A the subject of the first 2 equations we get: 
+
+\[A(S + 0.31) =56.7R + 0.231 \Delta \Rightarrow A = \frac{56.7R +0.231 \Delta}{S + 0.31}\]
+\[0.014A = 0.0203\delta - R(S+0.426) \Rightarrow A= \frac{0.0203\delta - R(S+0.426)}{0.014}\]
+\[\therefore \frac{56.7R +0.231 \Delta}{S + 0.31} = \frac{0.0203\delta - R(S+0.426)}{0.014}\]
+Collecting S terms:
+\[0.7938R +0.003234 \Delta=(S+0.31)[0.0203\Delta - R(0.426+S)]\]
+Simplifying the right hand side (RHS):
+\[RHS = (S + 0.31)[0.0203\Delta - R(0.426 +S)]\]
+\[=(S+0.31)[0.0203\Delta - 0.426R - RS]\]
+Expanding the brackets
+\[=0.0203\Delta S -0.426 RS - RS^2 +0.006293\Delta - 0.13206R -0.31RS\]
+Collecting like terms
+\[=0.0203 \Delta S -0.736RS - RS^2 + 0.006293\Delta - 0.13206R\]
+Bringing back the left side
+\[0.7938R + 0.736 RS + 0.13206R +RS^2 = 0.0203\Delta S +0.006293\Delta -  0.003234\Delta\]
+Collecting Like Terms
+\[0.92586R + 0.736 RS + RS^2 = 0.0203 \Delta S - 0.003056\Delta\]
+Factorising out R and \(\Delta\)
+\[R(0.92586 +0.736S + S^2) = \Delta (0.0203S - 0.003056)\]
+
+Substituting in \(\Theta = 56.7 R\)
+\[\frac{S\Theta}{56.7}(0.92586 + 0.0736S +S^2)=\Delta(0.0203S - 0.003056)\]
+\[\frac{56.7(0.0203S - 0.003056)}{S\Theta(0.92586 + 0.7365S+S^2)} = \frac{\Theta}{\Delta}\]
+
+\(\therefore\) Final Transfer Function:
+\[\frac{\Theta}{\Delta} = \frac{0.15101S - 0.1732752}{0.92586S + 0.736S^2 + S^3}\]
+Find poles to test for BIBO stability
+\[S^3 + 0.736S^2 + 0.92586S = 0\]
+\[S(S^2 + 0.736S + 0.92586) = 0\]
+
+\[\therefore S = 0\] 
+Using Quadratic Formula for remaining roots:
+\[S = \frac{-0.736 \pm \sqrt{0.736^2 - 4(1)(0.92586)}}{2(1)}\]
+\[S = \frac{-0.736 \pm \sqrt{-3.161744}}{2}\]
+\[S = -0.368 \pm 0.5j \sqrt{3.161744}\]
+\(\therefore\) Poles of S:
+\[S = 0, S= -0.368 + 0.5j \sqrt{3.161744}, S = -0.368 - 0.5j \sqrt{3.161744}\]
+\(\therefore\) Since all poles are all negative on the 'real axis' (left of the origin), this system must be stable.
