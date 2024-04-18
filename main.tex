@@ -1,0 +1,67 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amssymb}
+
+\title{Group Coursework}
+\author{Samuel Schofield, Terry McNally, Ethan Sloan}
+\date{April 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The aim of this project is to design a control system for the pitch of an aircraft. The control system diagram to get us started is shown in figure 1.\\\\
+The input of the system is given by \(\delta\), the elevator deflection angle. Figure 1 also shows the angle of attack, \(\alpha\), the pitch angle \(\theta\) and the pitch rate \(r\).\\\\
+Our Task is to do what boeing couldn't and design an MCAS system that is BIBO stable to keep the aircraft at a safe pitch and make sure that 737 max passengers only have to worry about doors falling off and not the aircraft nosediving.\\\\
+
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{plen.png}
+    \caption{Diagram of the assigned control system}
+    \label{fig:Figure 1}
+\end{figure}
+
+\section{The System}
+The system dynamics are described by the following equations:
+\[\dot{\alpha}=-0.31\alpha + 56.7r + 0.231\delta\]
+\[\dot{r}=-0.014\alpha - 0.426r +0.0203\delta\]
+\[\dot{\theta} = 56.7r\]\\
+The sensor has the transfer function:
+\[G_m(s) = exp(-0.005s)\]
+\newpage
+\section{Analysis - Deriving a Transfer Function}
+We start by applying a Laplace transform to each of these equations:
+\[\dot{\alpha}=-0.31\alpha + 56.7r + 0.231\delta\Rightarrow SA =-0.31A  + 56.7R + 0.231 \Delta\]
+\[\dot{r}=-0.014\alpha - 0.426r +0.0203\delta\Rightarrow SR=-0.014A  - 0.426R +0.0203 \Delta \]
+\[\dot{\theta} = 56.7r\Rightarrow S \Theta = 56.7R\]\\
+If we then make A the subject of both equations [1.1] and [1.2] we get:  
+\[A(S + 0.31) =56.7R + 0.231 \Delta \Rightarrow A = \frac{56.7R +0.231 \Delta}{S + 0.31}\]
+\[0.014A = 0.0203\delta - R(S+0.426) \Rightarrow A= \frac{0.0203\delta - R(S+0.426)}{0.014}\]
+\[\therefore \frac{56.7R +0.231 \Delta}{S + 0.31} = \frac{0.0203\delta - R(S+0.426)}{0.014}\]
+\[0.7938R +0.003234\Delta=(S+0.31)[0.0203\Delta - R(0.426+S)]\]
+\[RHS = (S + 0.31)[0.0203\Delta - R(0.426 +S)]\]
+\[=(S+0.31)[0.0203\Delta - 0.426R - RS]\]
+\[=0.0203\Delta S -0.426 RS - RS^2 +0.006293\Delta - 0.13206R -0.31RS\]
+\[=0.0203 \Delta S -0.736RS - RS^2 + 0.006293\Delta - 0.13206R\]
+\[0.7938R + 0.736 RS + 0.13206R +RS^2 = 0.0203\Delta S +0.006293\Delta -  0.003234\Delta\]
+\[0.92586R + 0.736 RS + RS^2 = 0.0203 \Delta S - 0.003056\Delta\]
+\[R(0.92586 +0.736S + S^2) = \Delta (0.0203S - 0.003056)\]
+
+\[\frac{S\Theta}{56.7}(0.92586 + 0.0736S +S^2)=\Delta(0.0203S - 0.003056)\]
+\[\frac{56.7(0.0203S - 0.003056)}{S\Theta(0.92586 + 0.7365S+S^2)} = \frac{\Theta}{\Delta}\]
+\[\frac{\Theta}{\Delta} = \frac{0.15101S - 0.1732752}{0.92586S + 0.736S^2 + S^3}\]
+
+\newpage
+\section{Control - Forming a PID Controller}
+We gave it a lot of P and gave the P some D.\\
+I is unneccessary
+\newpage
+\section{Results}
+Boeing is useless
+\newpage
+\section{Conclusion}
+In conclusion, I will not work for boeing
+\end{document}
