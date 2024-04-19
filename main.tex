@@ -1,6 +1,38 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{amsmath}
+\definecolor{CommentGreen}{rgb}{0.0,0.4,0.0}
+\definecolor{Background}{rgb}{0.9,1.0,0.85}
+\definecolor{lrow}{rgb}{0.914,0.918,0.922}
+\definecolor{drow}{rgb}{0.725,0.745,0.769}
+
+\usepackage{listings}
+\usepackage{textcomp}
+\lstloadlanguages{Python}%
+\lstset{
+    language=Python,
+    upquote=true, frame=single,
+    basicstyle=\small\ttfamily,
+    backgroundcolor=\color{Background},
+    keywordstyle=[1]\color{blue}\bfseries,
+    keywordstyle=[2]\color{purple},
+    keywordstyle=[3]\color{black}\bfseries,
+    identifierstyle=,
+    commentstyle=\usefont{T1}{pcr}{m}{sl}\color{CommentGreen}\small,
+    stringstyle=\color{purple},
+    showstringspaces=false, tabsize=5,
+    morekeywords={properties,methods,classdef},
+    morekeywords=[2]{handle},
+    morecomment=[l][\color{blue}]{...},
+    numbers=none, firstnumber=1,
+    numberstyle=\tiny\color{blue},
+    stepnumber=1, xleftmargin=10pt, xrightmargin=10pt
+}
+\usetikzlibrary{arrows.meta, positioning}
+% Define the equation numbering format
+\numberwithin{equation}{section}
 
 \title{Group Coursework}
 \author{Samuel Schofield, Terry McNally, Ethan Sloan}
@@ -14,6 +46,12 @@
 The aim of this project is to design a control system for the pitch of an aircraft. The control system diagram to get us started is shown in figure 1.\\\\
 The input of the system is given by \(\delta\), the elevator deflection angle. Figure 1 also shows the angle of attack, \(\alpha\), the pitch angle \(\theta\) and the pitch rate \(r\).\\\\
 Our Task is to do what boeing couldn't and design an MCAS system that is BIBO stable to keep the aircraft at a safe pitch and make sure that 737 max passengers only have to worry about doors falling off and not the aircraft nosediving.\\\\
+In order to judge this, we have 3 criteria to assess the success of our control of the system.
+\begin{itemize}
+    \item Stable - We are able to ensure the plane returns to the 'zero point' (meaning it has the correct pitch)
+    \item Zero Offset - Ensure that the plane returns to the exact required pitch. In oscillations we'd like to see amplitudes of less than \(20^o\)
+    \item Limited Overshoot - If the overshoot isn't adequately limited, not only would it be uncomfortable passengers, it could cause the system to be unstable in the opposite direction to the original 'kick'. This has obvious safety concerns and we don't want to cause a plane crash.
+\end{itemize}
 
 
 
@@ -23,45 +61,215 @@ Our Task is to do what boeing couldn't and design an MCAS system that is BIBO st
     \caption{Diagram of the assigned control system}
     \label{fig:Figure 1}
 \end{figure}
-
+\newpage
 \section{The System}
 The system dynamics are described by the following equations:
 \[\dot{\alpha}=-0.31\alpha + 56.7r + 0.231\delta\]
 \[\dot{r}=-0.014\alpha - 0.426r +0.0203\delta\]
 \[\dot{\theta} = 56.7r\]\\
+
+State space representation:
+
+%Matricees here
+
 The sensor has the transfer function:
 \[G_m(s) = exp(-0.005s)\]
 \newpage
 \section{Analysis - Deriving a Transfer Function}
 We start by applying a Laplace transform to each of these equations:
-\[\dot{\alpha}=-0.31\alpha + 56.7r + 0.231\delta\Rightarrow SA =-0.31A  + 56.7R + 0.231 \Delta\]
-\[\dot{r}=-0.014\alpha - 0.426r +0.0203\delta\Rightarrow SR=-0.014A  - 0.426R +0.0203 \Delta \]
-\[\dot{\theta} = 56.7r\Rightarrow S \Theta = 56.7R\]\\
-If we then make A the subject of both equations [1.1] and [1.2] we get:  
-\[A(S + 0.31) =56.7R + 0.231 \Delta \Rightarrow A = \frac{56.7R +0.231 \Delta}{S + 0.31}\]
-\[0.014A = 0.0203\delta - R(S+0.426) \Rightarrow A= \frac{0.0203\delta - R(S+0.426)}{0.014}\]
-\[\therefore \frac{56.7R +0.231 \Delta}{S + 0.31} = \frac{0.0203\delta - R(S+0.426)}{0.014}\]
-\[0.7938R +0.003234\Delta=(S+0.31)[0.0203\Delta - R(0.426+S)]\]
-\[RHS = (S + 0.31)[0.0203\Delta - R(0.426 +S)]\]
-\[=(S+0.31)[0.0203\Delta - 0.426R - RS]\]
-\[=0.0203\Delta S -0.426 RS - RS^2 +0.006293\Delta - 0.13206R -0.31RS\]
-\[=0.0203 \Delta S -0.736RS - RS^2 + 0.006293\Delta - 0.13206R\]
-\[0.7938R + 0.736 RS + 0.13206R +RS^2 = 0.0203\Delta S +0.006293\Delta -  0.003234\Delta\]
-\[0.92586R + 0.736 RS + RS^2 = 0.0203 \Delta S - 0.003056\Delta\]
-\[R(0.92586 +0.736S + S^2) = \Delta (0.0203S - 0.003056)\]
+\begin{equation}
+\dot{\alpha} = -0.31\alpha + 56.7r + 0.231\delta \Rightarrow SA = -0.31A + 56.7R + 0.231\Delta
+\end{equation}
+\begin{equation}
+\dot{r} = -0.014\alpha - 0.426r +0.0203\delta \Rightarrow SR = -0.014A - 0.426R +0.0203\Delta
+\end{equation}
+\begin{equation}
+\dot{\theta} = 56.7r \Rightarrow S\Theta = 56.7R
+\end{equation}
 
-\[\frac{S\Theta}{56.7}(0.92586 + 0.0736S +S^2)=\Delta(0.0203S - 0.003056)\]
-\[\frac{56.7(0.0203S - 0.003056)}{S\Theta(0.92586 + 0.7365S+S^2)} = \frac{\Theta}{\Delta}\]
-\[\frac{\Theta}{\Delta} = \frac{0.15101S - 0.1732752}{0.92586S + 0.736S^2 + S^3}\]
+If we then make \(A\) the subject of equations [3.1] and [3.2] we get:
+
+\begin{equation}
+A(S + 0.31) = 56.7R + 0.231 \Delta \Rightarrow A = \frac{56.7R + 0.231 \Delta}{S + 0.31}
+\end{equation}
+\begin{equation}
+0.014A = 0.0203\Delta - R(S + 0.426) \Rightarrow A = \frac{0.0203\Delta - R(S + 0.426)}{0.014}
+\end{equation}
+
+Since \(A=A\)
+\begin{equation}
+\therefore \frac{56.7R + 0.231 \Delta}{S + 0.31} = \frac{0.0203\Delta - R(S + 0.426)}{0.014}
+\end{equation}
+
+Collecting \(S\) terms:
+
+\begin{equation}
+0.7938R + 0.003234 \Delta = (S + 0.31)[0.0203\Delta - R(0.426 + S)]
+\end{equation}
+
+Simplifying the right-hand side (RHS):
+
+\begin{equation}
+RHS = (S + 0.31)[0.0203\Delta - R(0.426 + S)]
+\end{equation}
+
+\begin{equation}
+= (S + 0.31)[0.0203\Delta - 0.426R - RS]
+\end{equation}
+
+Expanding the brackets:
+
+\begin{equation}
+= 0.0203\Delta S - 0.426RS - RS^2 + 0.006293\Delta - 0.13206R - 0.31RS
+\end{equation}
+
+Collecting like terms:
+
+\begin{equation}
+= 0.0203 \Delta S - 0.736RS - RS^2 + 0.006293\Delta - 0.13206R
+\end{equation}
+
+Bringing back the left side:
+
+\begin{equation}
+0.7938R + 0.736 RS + RS^2 = 0.0203\Delta S + 0.006293\Delta - 0.003234\Delta
+\end{equation}
+
+Collecting like terms:
+
+\begin{equation}
+0.92586R + 0.736 RS + RS^2 = 0.0203 \Delta S - 0.003056\Delta
+\end{equation}
+
+Factorizing out \(R\) and \(\Delta\):
+
+\begin{equation}
+R(0.92586 + 0.736S + S^2) = \Delta(0.0203S - 0.003056)
+\end{equation}
+
+Substituting in \(S\Theta = 56.7R\):
+
+\begin{equation}
+\frac{S\Theta}{56.7}(0.92586 + 0.736S + S^2) = \Delta(0.0203S - 0.003056)
+\end{equation}
+
+\begin{equation}
+\frac{56.7(0.0203S - 0.003056)}{S\Theta(0.92586 + 0.7365S + S^2)} = \frac{\Theta}{\Delta}
+\end{equation}
+
+Therefore, final transfer function:
+
+\begin{equation}
+\frac{\Theta}{\Delta} = \frac{1.15101S - 0.1732752}{0.92586S + 0.736S^2 + S^3}
+\end{equation}
+
+Find poles to test for BIBO stability:
+
+\begin{equation}
+S^3 + 0.736S^2 + 0.92586S = 0
+\end{equation}
+
+\begin{equation}
+S(S^2 + 0.736S + 0.92586) = 0
+\end{equation}
+
+Therefore, \(S = 0\).
+
+Using the quadratic formula for remaining roots:
+
+\begin{equation}
+S = \frac{-0.736 \pm \sqrt{0.736^2 - 4(1)(0.92586)}}{2(1)}
+\end{equation}
+
+\begin{equation}
+S = \frac{-0.736 \pm \sqrt{-3.161744}}{2}
+\end{equation}
+
+\begin{equation}
+S = -0.368 \pm 0.5j \sqrt{3.161744}
+\end{equation}
+
+Therefore, poles of \(S\):
+
+\begin{equation}
+S = 0, S= -0.368 + 0.5j \sqrt{3.161744}, S = -0.368 - 0.5j \sqrt{3.161744}
+\end{equation}
+Therefore, since all poles are negative on the 'real axis' (left of the origin), this system must be stable.\\\\
+\textbf{For the closed loop transfer function:}
+\begin{equation}
+    \frac{K_c}{\frac{0.92586S + 0.736S^2 + S^3}{1.15101S - 0.1732752} + K_c} * \frac{1.15101S - 0.1732752}{1.15101S - 0.1732752}
+    = \frac{K_c (1.15101S - 0.1732752)}{0.92586S + 0.736S^2 + S^3 + K_c(1.1501S - 0.1732752}
+\end{equation}
+\begin{equation}
+    = \frac{K_c (1.15101S - 0.1732752)}{0.92586S + 0.736S^2 + S^3 + 1.1510K_c S - 0.1732752K_c}
+\end{equation}
+\begin{equation}
+     = \frac{K_c (1.15101S - 0.1732752)}{S^3 + 0.736S^2 + S(0.92586+1.15101K_c) - 0.1732752K_c}
+\end{equation}
 
 \newpage
 \section{Control - Forming a PID Controller}
-We gave it a lot of P and gave the P some D.\\
-I is unneccessary
-\newpage
-\section{Results}
-Boeing is useless
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Block Diagram.jpg}
+    \caption{PD Controller block diagram}
+    \label{fig:enter-label}
+\end{figure}
+Here is the code we used to form our PID controller using our transfer function and adding the sensor delay:
+\begin{lstlisting} [language=python]
+#This is the delay for our sytem to react
+delay=np.exp(5e-3)
+
+Gpid=kp+ki/s+kd*s*(-delay*s)
+
+G_load = ctrl.feedback(G, Gpid, sign=-1)
+
+t_imp, theta_imp=ctrl.impulse_response(G_load)
+
+#below is the code to plot a graph
+plt.plot(t_imp, np.rad2deg(theta_imp))
+
+plt.grid(True)
+
+plt.show
+
+\end{lstlisting}
+%___
+To find the closest to ideal PID parameters, we used the Ziegler - Nichols method.
+This involves finding the largest value of P with I and D as zero where the system oscillates without becoming unstable. \\\\
+This formed a set of values of:\\
+\(kP = 0.8(50) = 40\)\\
+\(kD = 1.215/8 = 0.151875\)\\
+As shown in figure 3 the graph formed was perfect up till 20 seconds where the angle dropped rapidly.\\\\
+%UGHHHH
+The most ideal values we found were as follows:\\
+\[kP = 5\times10^{12}\]
+\[kI = 0.1\]
+\[kD = 0.1\]
+This produced the graph in Figure 4.\\\\
+This graph ticks all our Criteria:
+\begin{enumerate}
+\item [\checkmark] \textbf{Stable} - The graph remains stable and does not have massive increases or decreases in angle. 
+\item [\checkmark] \textbf{Zero Offset} - The pitch angle returns to zero after just 12 seconds
+\item [\checkmark] \textbf{Limited Overshoot} - The minimum and maximum angle stay well within our limits and don't even reach \(-2^o\) and \(+3^o\) respectively  
+\end{enumerate}
+%
+However we are unsure whether a proportional value of five trillion is realistic as it may be impossible to implement. However in are testing we were unable to find another value that fulfilled all of our criteria as many numbers tended to have an exponential decline in angle after (at best) a few minutes.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{FIG 3.png}
+    \caption{Graph obtained using Ziegler-Nichols method.}
+    \label{fig:enter-label}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{FIG 4.png}
+    \caption{Final Graph}
+    \label{fig:enter-label}
+\end{figure}
+
 \newpage
 \section{Conclusion}
-In conclusion, I will not work for boeing
+In conclusion, stabalising this system 
 \end{document}
